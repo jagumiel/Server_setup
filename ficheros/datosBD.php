@@ -1,0 +1,1 @@
+<?php $mysqluser = ""; $mysqlpass = ""; ?>

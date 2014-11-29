@@ -1,0 +1,700 @@
+#!/bin/bash
+
+mysql -u=root -p=euiti < BDWeb.sql
+
+#etc.
+#!/bin/bash
+# Menu de seleccion de logs
+
+PS3='Que desea mostrar? Introduzca una opcion valida: '  
+opciones=("Intentos de hoy" "Intentos de la ultima semana" "Intentos del ultimo mes" "Mostrar todo" "Volver atras")
+select opt in "${opciones[@]}"
+do
+    case $opt in
+        "Intentos de hoy")
+            echo "Ha elegido mostrar los intentos de conexion de hoy"
+	    ./log_printer/1_Today.sh
+	    echo " "
+	    echo " "
+	    ./log_printer/print_submenu.sh
+            ;;
+        "Intentos de la ultima semana")
+            echo "Ha elegido mostrar los intentos de conexion de la ultima semana"
+	    ./log_printer/2_Last_Week.sh
+	    echo " "
+	    echo " "
+	    ./log_printer/print_submenu.sh
+            ;;
+        "Intentos del ultimo mes")
+            echo "Ha elegido mostrar los intentos de conexion de la ultima semana"
+	    ./log_printer/3_Last_Month.sh
+	    echo " "
+	    echo " "
+	    ./log_printer/print_submenu.sh
+            ;;
+        "Mostrar todo")
+            echo "Ha elegido mostrar todos los intentos de conexion"
+	    ./log_printer/4_All.sh
+	    echo " "
+	    echo " "
+	    ./log_printer/print_submenu.sh
+            ;;
+        "Volver atras")
+	    echo "Volver al menu principal"
+            break
+            ;;
+        *) echo Opcion no valida;;
+    esac
+done
+#!/bin/bash
+# Menu de seleccion de logs
+
+PS3='Que desea mostrar? Introduzca una opcion valida: '  
+opciones=("Intentos de hoy" "Intentos de la ultima semana" "Intentos del ultimo mes" "Volver atras")
+select opt in "${opciones[@]}"
+do
+    case $opt in
+        "Intentos de hoy")
+            echo "Ha elegido mostrar los intentos de conexion de hoy"
+	    ./log_printer/1_Today.sh
+	    echo " "
+	    echo " "
+	    ./log_printer/print_submenu.sh
+            ;;
+        "Intentos de la ultima semana")
+            echo "Ha elegido mostrar los intentos de conexion de la ultima semana"
+	    ./log_printer/2_Last_Week.sh
+	    echo " "
+	    echo " "
+	    ./log_printer/print_submenu.sh
+            ;;
+        "Intentos del ultimo mes")
+            echo "Ha elegido mostrar los intentos de conexion de la ultima semana"
+	    ./log_printer/3_Last_Month.sh
+	    echo " "
+	    echo " "
+	    ./log_printer/print_submenu.sh
+            ;;
+        "Mostrar todo")
+            echo "Ha elegido mostrar todos los intentos de conexion"
+	    ./log_printer/4_All.sh
+	    echo " "
+	    echo " "
+	    ./log_printer/print_submenu.sh
+            ;;
+        "Volver atras")
+	    echo "Volver al menu principal"
+            break
+            ;;
+        *) echo Opcion no valida;;
+    esac
+done
+#!/bin/bash
+#Instalacion de Apache
+
+sudo apt-get install aptitude #Una instalacion limpia de Ubuntu no tiene aptitude.
+estado="$(sudo aptitude show apache2 | grep Estado)"
+echo "$estado" #Comprobacion del contenido de la variable estado.
+if [ "$estado" == "Estado: instalado" ]; then
+	echo "El programa ya esta instalado. No hay que hacer nada mas."
+else
+	echo "El progama no esta instalado. Se instalara a continuacion"
+	sudo apt-get update #Es posible que no haga falta, pero es conveniente tener actualizados los repositorios.
+	sudo apt-get install apache2
+fi
+sudo service apache2 start #Una vez instalado el servidor, arrancarlo, no?
+
+#Es posible instalar todo: sudo apt-get install apache2 php5-mysql libapache2-mod-php5 mysql-server
+#etc.
+
+#!/bin/bash
+#Instalacion de Apache
+
+sudo apt-get install aptitude #Una instalacion limpia de Ubuntu no tiene aptitude.
+estado="$(sudo aptitude show apache2 | grep Estado)"
+echo "$estado" #Comprobacion del contenido de la variable estado.
+if [ "$estado"=="Estado: instalado" ];then
+	echo "El programa ya esta instalado. No hay que hacer nada mas."
+else
+	echo "El progama no esta instalado. Se instalara a continuacion"
+	sudo apt-get update #Es posible que no haga falta, pero es conveniente tener actualizados los repositorios.
+	sudo apt-get install apache2
+	sudo service apache2 start #Una vez instalado el servidor, arrancarlo, no?
+fi
+
+#Es posible instalar todo: sudo apt-get install apache2 php5-mysql libapache2-mod-php5 mysql-server
+#etc.
+
+#!/bin/bash
+#Instalacion de MySQL
+
+CC="pgcc" CFLAGS="-O2" \
+./configure --prefix=/sw/pkg/apache \
+--enable-rewrite=shared \
+--enable-speling=shared
+
+#etc. 
+
+
+#http://httpd.apache.org/docs/current/es/install.html#configure
+#https://help.ubuntu.com/10.04/serverguide/httpd.html
+#!/bin/bash
+#Instalacion de MySQL
+
+cd /etc/apache2/sites-available #Vamos al directorio donde se encuentran los archivos de configuracion
+CC="pgcc" CFLAGS="-O2" \
+./configure --prefix=/sw/pkg/apache \
+--enable-rewrite=shared \
+--enable-speling=shared
+
+#etc. 
+
+
+#http://httpd.apache.org/docs/current/es/install.html#configure
+#https://help.ubuntu.com/10.04/serverguide/httpd.html
+#!/bin/bash
+#Configuracion de Apache
+
+#Anadir ServerName localhost
+cd /etc/apache2/sites-available #Vamos al directorio donde se encuentran los archivos de configuracion
+
+sudo chmod 777 -R /etc/apache2/sites-available/
+
+estado="$(grep "ServerName localhost" /etc/apache2/sites-available/default)"
+
+	if [ "$estado"=="ServerName localhost" ];then
+		echo "El fichero default ya contiene la linea $estado"
+	else
+		echo "ServerName localhost" >> /etc/apache2/sites-available/default
+
+	fi
+
+sudo chmod 755 -R /etc/apache2/sites-available/
+
+#Anadir el modulo de seguridad SSL.
+
+sudo a2enmod ssl
+sudo a2ensite default-ssl
+sudo service apache2 restart
+sudo service apache2 reload
+
+#etc. 
+
+#SOURCES:
+#http://httpd.apache.org/docs/current/es/install.html#configure
+#https://help.ubuntu.com/10.04/serverguide/httpd.html
+#!/bin/bash
+#Configuracion de Apache
+
+#Anadir ServerName localhost
+cd /etc/apache2/sites-available #Vamos al directorio donde se encuentran los archivos de configuracion
+
+sudo chmod 777 -R /etc/apache2/sites-available/
+
+estado="$(grep "ServerName localhost" /etc/apache2/sites-available/default)"
+
+	if [ "$estado"=="ServerName localhost" ];then
+		echo "El fichero default ya contiene la linea $estado"
+	else
+		echo "ServerName localhost" >> /etc/apache2/sites-available/default
+
+	fi
+
+sudo chmod 755 -R /etc/apache2/sites-available/
+
+#Anadir el modulo de seguridad SSL.
+
+sudo a2enmod ssl
+sudo a2ensite default-ssl
+sudo service apache2 restart
+sudo service apache2 reload
+
+#etc. 
+
+#http://httpd.apache.org/docs/current/es/install.html#configure
+#https://help.ubuntu.com/10.04/serverguide/httpd.html
+#!/bin/bash
+#Test de Apache
+	
+	sudo service apache2 start #Arrancamos el servicio, por si acaso.
+	ps ax | grep httpd #Mirar si sale httpd
+	netstat -l | grep http #Mirar que Apache esté escuchando a los puertos 80 y 443. http y https.
+	curl 127.0.0.1 #Esto muestra la página web. Como es consola, solo muestra el codigo html.
+	#Hemos probado en una instalacion limpia de Ubuntu y no reconoce "curl". Abrimos con el navegador.
+	sensible-browser http://127.0.0.1/
+
+#etc.
+#!/bin/bash
+#Test de Apache
+	
+	sudo service apache2 start #Arrancamos el servicio, por si acaso.
+	ps ax | grep httpd #Mirar si sale httpd
+	netstat -l | grep http #Mirar que Apache esté escuchando a los puertos 80 y 443. http y https.
+	curl 127.0.0.1 #Esto muestra la página web. Como es consola, solo muestra el codigo html.
+
+#etc.
+#!/bin/bash
+#Instalacion de MySQL
+
+estado="$(sudo aptitude show php5 | grep Estado)"
+echo "$estado" #Comprobacion del contenido de la variable estado.
+if [ "$estado" == "Estado: instalado" ]; then
+	echo "PHP5 ya esta instalado en su equipo"
+else
+	echo "PHP5 no esta instalado. Se instalara a continuacion"
+	sudo apt-get update #Es conveniente tener actualizados los repositorios.
+	sudo apt-get install apache2
+	sudo apt-get install php5-mysql #Para configurar PHP es necesario este paquete.
+fi
+
+#etc.
+#!/bin/bash
+#Instalacion de MySQL
+
+sudo apt-get update #Es posible que no haga falta, pero es conveniente tener actualizados los repositorios.
+sudo apt-get install php5
+sudo apt-get install php5-mysql #Para configurar PHP es necesario este paquete.
+#etc.
+#!/bin/bash
+
+sudo apt-get update
+sudo apt-get install php5-mysql
+#!/bin/bash
+#Test de PHP
+
+username="$(id -u -n)"
+sudo adduser $username www-data #Anade al user al grupo www-data
+#sudo chown $username.users /var/www
+#sudo chown -R www-data:www-data /var/www
+sudo chmod -R g+rwx /var/www #Da permisos al grupo
+sudo chmod 777 -R /var/www/
+#sudo cp testphp.php /var/www/
+echo "<?php phpinfo();?>" > /var/www/testphp.php #No tengo permiso, con sudo antes, tampoco me deja.
+sensible-browser /var/www/testphp.php #Se podría poner firefox, pero mejor el predeterminado, que sabemos que esta instalado.
+sudo chmod 755 -R /var/www/ #Permisos de rwx para admin y rx para el resto.
+#etc. 
+
+#!/bin/bash
+#Test de PHP
+
+username="$(id -u -n)"
+sudo adduser $username www-data #Anade al user al grupo www-data
+#sudo chown $username.users /var/www
+#sudo chown -R www-data:www-data /var/www
+sudo chmod -R g+rwx /var/www #Da permisos al grupo
+sudo chmod 777 -R /var/www/
+#sudo cp testphp.php /var/www/
+echo "<?php phpinfo();?>" > /var/www/testphp.php #No tengo permiso, con sudo antes, tampoco me deja.
+sensible-browser /var/www/testphp.php #Se podría poner firefox, pero mejor el predeterminado, que sabemos que esta instalado.
+
+
+
+#etc. 
+
+#!/bin/bash
+#Instalacion de MySQL
+
+estado="$(sudo aptitude show mysql-client-core-5.5 | grep Estado)"
+echo "$estado" #Comprobacion del contenido de la variable estado.
+if [ "$estado" == "Estado: instalado" ]; then
+	echo "El cliente MySQL ya esta instalado en su equipo."
+else
+	echo "MySQL no esta instalado. Se instalara a continuacion"
+	sudo apt-get update #Es conveniente tener actualizados los repositorios.
+	sudo apt-get install mysql-client-core-5.5
+fi
+
+#etc.
+#!/bin/bash
+#Instalacion de MySQL
+
+estado="$(sudo aptitude show mysql-client-core-5.5 | grep Estado)"
+echo "$estado" #Comprobacion del contenido de la variable estado.
+if [ "$estado"=="Estado: instalado" ];then
+	echo "El cliente MySQL ya esta instalado en su equipo."
+else
+	echo "MySQL no esta instalado. Se instalara a continuacion"
+	sudo apt-get update #Es conveniente tener actualizados los repositorios.
+	sudo apt-get install ysql-client-core-5.5
+fi
+
+#etc.
+#!/bin/bash
+
+TEMPORAL_nomBD="temp/TEMPORAL_nomBD.txt"
+
+sudo /etc/init.d/mysql start
+
+echo "Se ha iniciado MySQL"
+
+echo "Introduce un nombre para la Base de Datos"
+2>$TEMPORAL_nomBD
+nomBD='more $TEMPORAL_nomBD'
+
+echo "imprimo temporal_nomBD"
+echo 'more $TEMPORAL_nomBD'
+
+echo "Introduce el usuario a crear"
+2> $TEMPORAL_nomBD
+nomBD='more $TEMPORAL_nomBD'
+
+echo "imprimo temporal_nomBD"
+echo 'more $TEMPORAL_nomBD'
+
+echo "Introduce la antigua contrasena"
+read oldpassword
+echo "Introduce la nueva contrasena"
+read newpass
+
+echo "$oldpassword"
+echo "$newpass"
+
+sudo mysqladmin -u root -p $oldpassword password $newpass
+#!/bin/bash
+
+sudo service mysql start
+sudo /etc/init.d/mysql start
+
+echo "Se ha iniciado MySQL"
+
+echo "A continuacion se creara un usuario y una base de datos"
+echo " "
+echo "Introduce un nombre para la Base de Datos"
+read nomBD
+
+echo "Introduce el usuario a crear"
+read nomUser
+
+echo "Introduce una contrasena para $nomUser"
+read pass
+
+#Ahora creamos los comandos de mySQL con los datos proporcionados.
+C1="CREATE DATABASE IF NOT EXISTS $nomBD;"
+C2="GRANT ALL *.* TO '$nomUser'@'localhost' IDENTIFIED BY '$pass';"
+C3="FLUSH PRIVILEGES;" #Recarga para que los cambios en los permisos tengan efecto.
+
+echo "Es necesario que introduzca la contrasena del servidor mySQL"
+read passwordSQL
+
+Instruccion="${C1}${C2}${C3}"
+
+mysql -uroot -p$passwordSQL -e "$Instruccion"
+
+#--sudo mysqladmin -u root -p $passwordSQL -e "$Instruccion"
+#!/bin/bash
+
+sudo /etc/init.d/mysql start
+
+echo "Se ha iniciado MySQL"
+
+echo "A continuacion se creara un usuario y una base de datos"
+echo " "
+echo "Introduce un nombre para la Base de Datos"
+read nomBD
+
+echo "Introduce el usuario a crear"
+read nomUser
+
+echo "Introduce una contrasena para $nomUser"
+read pass
+
+#Ahora creamos los comandos de mySQL con los datos proporcionados.
+C1="CREATE DATABASE IF NOT EXISTS $nomBD;"
+C2="GRANT ALL *.* TO '$nomUser'@'localhost' IDENTIFIED BY '$pass';"
+C3="FLUSH PRIVILEGES;" #Recarga para que los cambios en los permisos tengan efecto.
+
+echo "Es necesario que introduzca la contrasena del servidor mySQL"
+read passwordSQL
+
+Instruccion="${C1}${C2}${C3}"
+
+mysql -uroot -p$passwordSQL -e "$Instruccion"
+
+#--sudo mysqladmin -u root -p $passwordSQL -e "$Instruccion"
+#!/bin/bash
+
+username="$(id -u -n)"
+netstat -l | grep mysql > /home/$username/listening.txt
+
+grep mysql /home/$username/listening.txt 
+if test $? -eq 0; then
+	echo "Test Correcto"
+else
+	echo "Test Incorrecto"
+
+fi
+
+#etc.
+#!/bin/bash
+
+username="$(id -u -n)"
+netstat -l | grep mysql > /home/$username/listening.txt
+
+#if [ sed -n 'mysql' -f /home/$username/listening.txt ]; then
+grep mysql /home/$username/listening.txt 
+if test $? -eq 0; then
+	echo "Test Correcto"
+else
+	echo "Test Incorrecto"
+
+fi
+
+#etc.
+Hay paquetes que se pueden instalar varios a la vez. Se pueden agregar nuevas opciones.
+
+1.- Es posible que despu�s de la instalaci�n se pueda ejecutar un comando para que
+se haga un "sudo service apache2 start" al arrancar el pc. Me refiero a que se inicie
+Apache siempre que se encienda el PC. Con sudo a lo mejor es mucho lio, ya que pedir� clave.
+
+Prueba: #!/bin/bash
+#Instalacion de MySQL
+
+sudo apt-get update #Es posible que no haga falta, pero es conveniente tener actualizados los repositorios.
+sudo apt-get install php5 libapache2-mod-php5
+#etc.
+#!/bin/bash
+# Menu de la aplicacion
+#DUDA: Qué diferencia hay entre /bin/bash y /bin/sh?
+
+PS3='Que desea hacer? Introduzca una opcion valida: '  #Mirar si poniendo UTF-32 se pueden poner tildes y la apertura de interrogacion
+opciones=("Instalar Apache" "Configurar Apache" "Poner en marcha y testear el servicio web Apache"
+"Instalar PHP" "Configurar PHP" "Testear el modulo PHP" "Instalar MySQL" "Configurar MySQL"
+"Testear el servicio MySQL" "Instalar la aplicacion" "Gestionar intentos de conexion y mostrar Logs" "Salir")
+select opt in "${opciones[@]}"
+do
+    case $opt in
+        "Instalar Apache")
+            echo "Ha elegido Instalar Apache"
+	    ./1_Install_Apache.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Configurar Apache")
+            echo "Ha elegido Configurar Apache"
+	    ./2_Configure_Apache.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Poner en marcha y testear el servicio web Apache")
+            echo "Ha elegido probar el servicio web Apache"
+            echo "A continuacion se haran unos tests"
+	    ./3_Test_Apache.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Instalar PHP")
+            echo "Ha elegido instalar PHP"
+	    ./4_Install_PHP.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Configurar PHP")
+            echo "Ha elegido Configurar PHP"
+	    ./5_Configure_PHP.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Testear el modulo PHP")
+            echo "Ha elegido probar el modulo PHP"
+	    ./6_Test_PHP.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Instalar MySQL")
+            echo "Ha elegido instalar MySQL"
+	    ./7_Install_MYSQL.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Configurar MySQL")
+            echo "Ha elegido Configurar MySQL"
+	    ./8_Configure_MYSQL.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Testear el servicio MySQL")
+            echo "Ha elegido probar el servicio MySQL"
+	    ./9_Test_MYSQL.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Instalar la aplicacion")
+            echo "Ha elegido instalar la aplicacion"
+	    ./10_Install_App.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Gestionar intentos de conexion y mostrar Logs")
+            echo "Ha elegido gestionar los intentos de conexion y mostrar los Logs"
+	    ./11_Show_Logs.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Salir")
+	    echo "Programa finalizado"
+            break
+            ;;
+        *) echo Opcion no valida;;
+    esac
+done
+
+
+#!/bin/bash
+# Menu de la aplicacion
+#DUDA: Qué diferencia hay entre /bin/bash y /bin/sh?
+
+PS3='Que desea hacer? Introduzca una opcion valida: '  #Mirar si poniendo UTF-32 se pueden poner tildes y la apertura de interrogacion
+opciones=("Instalar Apache" "Configurar Apache" "Poner en marcha y testear el servicio web Apache"
+"Instalar PHP" "Configurar PHP" "Testear el modulo PHP" "Instalar MySQL" "Configurar MySQL"
+"Testear el servicio MySQL" "Instalar la aplicacion" "Gestionar intentos de conexion y mostrar Logs" "Salir")
+select opt in "${opciones[@]}"
+do
+    case $opt in
+        "Instalar Apache")
+            echo "Ha elegido Instalar Apache"
+	    ./1_Install_Apache.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Configurar Apache")
+            echo "Ha elegido Configurar Apache"
+	    ./2_Configure_Apache.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Poner en marcha y testear el servicio web Apache")
+            echo "Ha elegido probar el servicio web Apache"
+            echo "A continuacion se haran unos tests"
+	    ./3_Test_Apache.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Instalar PHP")
+            echo "Ha elegido instalar PHP"
+	    ./4_Install_PHP.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Configurar PHP")
+            echo "Ha elegido Configurar PHP"
+	    ./5_Configure_PHP.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Testear el modulo PHP")
+            echo "Ha elegido probar el modulo PHP"
+	    ./6_Test_PHP.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Instalar MySQL")
+            echo "Ha elegido instalar MySQL"
+	    ./7_Install_MYSQL.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Configurar MySQL")
+            echo "Ha elegido Configurar MySQL"
+	    ./8_Configure_MYSQL.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Testear el servicio MySQL")
+            echo "Ha elegido probar el servicio MySQL"
+	    ./9_Test_MYSQL.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Instalar la aplicacion")
+            echo "Ha elegido instalar la aplicacion"
+	    ./10_Install_App.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Gestionar intentos de conexion y mostrar Logs")
+            echo "Ha elegido gestionar los intentos de conexion y mostrar los Logs"
+	    ./11_Show_Logs.sh
+	    echo " "
+	    echo " "
+	    ./print_menu.sh
+            ;;
+        "Salir")
+	    echo "Programa finalizado"
+            break
+            ;;
+        *) echo invalid option;;
+    esac
+done
+
+
+#!/bin/bash
+#Test de PHP
+
+echo <password> | sudo -S ./6_test_PHP.sh
+
+#etc. 
+
+#!/bin/bash
+# Menu de la aplicacion
+
+        echo "1) Instalar Apache"
+	echo "2) Configurar Apache"
+        echo "3) Poner en marcha y testear el servicio web Apache"
+        echo "4) Instalar PHP"
+        echo "5) Configurar PHP"
+        echo "6) Testear el modulo PHP"
+        echo "7) Instalar MySQL"
+        echo "8) Configurar MySQL"
+        echo "9) Testear el servicio MySQL"
+        echo "10) Instalar la aplicacion"
+        echo "11) Gestionar intentos de conexion y mostrar Logs"
+        echo "12) Salir"
+
+#etc.
+#!/bin/bash
+# Menu de la aplicacion
+
+        echo "1) Instalar Apache")
+	echo "2) Configurar Apache")
+        echo "3) Poner en marcha y testear el servicio web Apache")
+        echo "4) Instalar PHP")
+        echo "5) Configurar PHP")
+        echo "6) Testear el modulo PHP")
+        echo "7) Instalar MySQL")
+        echo "8) Configurar MySQL")
+        echo "9) Testear el servicio MySQL")
+        echo "10) Instalar la aplicacion")
+        echo "11) Gestionar intentos de conexion y mostrar Logs")
+        echo "12) Salir")
+
+#etc.
+#!/bin/bash
+#Prueba
+
+#echo"prueba" O como se hace aqui un printline?
+	./menu.sh
+
+#etc.
+
+#EDITO:FUNCIONA
